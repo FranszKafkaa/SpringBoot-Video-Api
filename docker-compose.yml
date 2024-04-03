@@ -1,0 +1,82 @@
+version: '3'
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    networks: 
+      - broker-kafka
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+  
+  mysql:
+    build:
+      context: ./docker/mysql
+    ports:
+      - 3306:3306
+    volumes:
+      - 'broker-mysql:/var/lib/mysql'
+    networks:
+      - broker-kafka
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    networks: 
+      - broker-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - 9092:9092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      
+  minio:
+      image: 'minio/minio:latest'
+      ports:
+          - '${FORWARD_MINIO_PORT:-8900}:8900'
+          - '${FORWARD_MINIO_CONSOLE_PORT:-9000}:9000'
+      environment:
+          MINIO_ROOT_USER: 'sail'
+          MINIO_ROOT_PASSWORD: 'password'
+          MINIO_STORAGE_USE_HTTPS: 'false'
+          MINIO_ACCESS_KEY: AKIAIOSFODNN7EXAMPLE
+          MINIO_SECRET_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      volumes:
+          - 'broker-minio:/data/minio'
+          - ./docker/minio/docker-entrypoint.sh:/docker-entrypoint.sh
+      networks:
+          - broker-kafka
+      healthcheck:
+          test:
+              - CMD
+              - curl
+              - '-f'
+              - 'http://localhost:9000/minio/health/live'
+          retries: 3
+          timeout: 5s
+      entrypoint: ./docker-entrypoint.sh
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop:latest
+    networks: 
+      - broker-kafka
+    depends_on:
+      - kafka
+    ports:
+      - 19000:9000
+    environment:
+      KAFKA_BROKERCONNECT: kafka:29092
+
+
+networks: 
+  broker-kafka:
+    driver: bridge
+volumes:
+    broker-mysql:
+        driver: local
+    broker-minio:
+        driver: local

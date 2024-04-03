@@ -1,0 +1,23 @@
+#!/bin/bash
+
+build(){
+    docker compose build
+}
+
+run(){
+    docker compose up -d
+}
+
+stop(){
+    docker compose down -v
+}
+
+run-server(){
+    ./mvnw spring-boot:run
+}
+
+if type "$1" &> /dev/null; then
+    "$1"
+else
+    echo "$1 not found"
+fi

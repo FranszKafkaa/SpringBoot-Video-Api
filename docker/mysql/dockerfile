@@ -1,0 +1,11 @@
+FROM mysql:latest
+
+ENV MYSQL_ALLOW_EMPTY_PASSWORD=true
+ENV MYSQL_USER=test
+ENV MYSQL_PASSWORD=password
+
+COPY init.sql /docker-entrypoint-initdb.d/
+
+EXPOSE 3306
+
+RUN echo "GRANT ALL PRIVILEGES ON teste.* TO 'test'@'%';" > /docker-entrypoint-initdb.d/grant.sql

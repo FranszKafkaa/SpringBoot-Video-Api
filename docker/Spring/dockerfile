@@ -1,0 +1,9 @@
+FROM eclipse-temurin:21-jdk-alpine
+
+WORKDIR /app
+
+VOLUME ../../ /app
+
+RUN ./mvnw clean package
+
+ENTRYPOINT [ "./run.sh" ]
