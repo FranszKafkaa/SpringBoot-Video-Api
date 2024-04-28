@@ -11,8 +11,13 @@ public class KafkaListenerComponent {
         System.out.println("listned in message " + data.value() + " key " + data.key());
     }
 
-    @KafkaListener(topics = "video", groupId = "groupid")
+    @KafkaListener(topics = "send_video", groupId = "groupid")
     void videoCompresser(ConsumerRecord<String, String> data){
         System.out.println("ai que delicia o verao ain");
+    }
+
+    @KafkaListener(topics = "recieved_video", groupId = "group_id")
+    void videoDone(){
+        System.out.println("ola mundo");
     }
 }

@@ -56,7 +56,7 @@ public class MinioUtils {
      * @param objectName
      * @param contentType
      * @return io.minio.ObjectWriteResponse
-    */
+     */
     @SneakyThrows(Exception.class)
     public ObjectWriteResponse uploadFile(String bucketName, MultipartFile file, String objectName,
             String contentType) {

@@ -28,7 +28,7 @@ public class VideoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Video>> listAll(){
+    public ResponseEntity<List<Video>> listAll() {
         return new ResponseEntity<List<Video>>(videoService.listAll(), HttpStatus.ACCEPTED);
     }
 }

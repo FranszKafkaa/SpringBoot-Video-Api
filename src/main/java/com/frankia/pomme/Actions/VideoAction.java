@@ -13,33 +13,32 @@ import com.frankia.pomme.Services.VideoService;
 import com.frankia.pomme.Utils.MinioUtils;
 
 @Service
-public class VideoAction implements VideoService{
+public class VideoAction implements VideoService {
 
     @Autowired
     private VideoRepository videoRepository;
 
     @Autowired
-    private KafkaTemplate<String,String> kafkaTemplate;
+    private KafkaTemplate<String, String> kafkaTemplate;
 
     @Autowired
     private MinioUtils minioUtils;
 
-
     @Override
     public Video Store(Video video, MultipartFile file) {
-        try{
+        try {
             minioUtils.uploadFile("main", file, video.getName(), file.getContentType());
             kafkaTemplate.send("video", "rola durassa");
-            return videoRepository.save(video);    
-        }catch(Exception e){
+            return videoRepository.save(video);
+        } catch (Exception e) {
             throw e;
         }
 
     }
 
     @Override
-    public List<Video> listAll(){
+    public List<Video> listAll() {
         return videoRepository.findAll();
     }
-    
+
 }
